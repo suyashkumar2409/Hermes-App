@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "797321789148",
+    "firebase_url": "https://hermes-f53cf.firebaseio.com",
+    "project_id": "hermes-f53cf",
+    "storage_bucket": "hermes-f53cf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:797321789148:android:ededc07859cea60d",
+        "android_client_info": {
+          "package_name": "com.escapeestudios.hermes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "797321789148-0bpd2678iujc7mhic7g31e8h3782pb5g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpeffOQgS3lw_Q8QizI0CEpUZ7eb1QxRc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "797321789148-0bpd2678iujc7mhic7g31e8h3782pb5g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
