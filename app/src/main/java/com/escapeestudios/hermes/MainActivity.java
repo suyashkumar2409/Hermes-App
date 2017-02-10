@@ -1,6 +1,7 @@
 package com.escapeestudios.hermes;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,6 +26,10 @@ public class MainActivity extends AppCompatActivity {
 
 //    ****************  Activity Objects  ****************************************
     private Context ctx;
+    private String mUserName;
+
+//    ****************  Activity Constants ***************************************
+    private static final String ANONYMOUS = "ANONYMOUS";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,10 +48,11 @@ public class MainActivity extends AppCompatActivity {
 
                 if(currentUser != null)
                 {
-                    Toast.makeText(ctx, "Signed in",Toast.LENGTH_SHORT).show();
+                    onSignedInInitialise(currentUser.getDisplayName());
                 }
                 else
                 {
+                    onSignedOutCleanUp();
                     startActivityForResult(
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
@@ -69,16 +75,45 @@ public class MainActivity extends AppCompatActivity {
         AppEventsLogger.activateApp(this);
     }
 
-
+    @Override
     protected void onResume(){
         super.onResume();
-        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
-    }
-
-    protected void onPause(){
-        super.onPause();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
+    @Override
+    protected void onPause(){
+        super.onPause();
+        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == RC_SIGN_IN)
+        {
+            if(resultCode == RESULT_OK)
+            {
+                Toast.makeText(ctx, "Signed in",Toast.LENGTH_SHORT).show();
+            }
+            else if(resultCode == RESULT_CANCELED)
+            {
+                finish();
+            }
+        }
+    }
+    private void onSignedInInitialise(String userName)
+    {
+        mUserName = userName;
+
+    }
+
+    private void onSignedOutCleanUp()
+    {
+        mUserName = ANONYMOUS;
+    }
 }
 
