@@ -3,6 +3,7 @@ package com.escapeestudios.hermes;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -30,6 +31,10 @@ public class MainActivity extends AppCompatActivity {
     private Context ctx;
     private String mUserName;
 
+//    ****************  View Objects **********************************************
+    private ViewPager mViewPager;
+    private AppPagerAdapter mAppPagerAdapter;
+
 //    ****************  Activity Constants ***************************************
     private static final String ANONYMOUS = "ANONYMOUS";
     @Override
@@ -37,8 +42,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 //        ************** Write Main Code here *********************
-
         ctx = this.getApplicationContext();
+
+//        ************** Pager Code *******************************
+
+        mAppPagerAdapter =
+                new AppPagerAdapter(
+                        getSupportFragmentManager());
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(mAppPagerAdapter);
 
 //        ************** All Firebase initialisations ***************
         mFirebaseAuth = FirebaseAuth.getInstance();

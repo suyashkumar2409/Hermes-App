@@ -6,8 +6,10 @@
     <string name="check_in">Check In</string>
 
 
-
     <!--********** Facebook Login Essentials ************-->
     <string name="facebook_app_id">141191076393885</string>
     <string name="fb_login_protocol_scheme">fb141191076393885</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
