@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
@@ -28,7 +29,7 @@ import java.util.Arrays;
 public class MainActivity extends AppCompatActivity {
 
 //  ******************  startActivityForResult Constants **************************
-    private static final int RC_SIGN_IN = 123;
+    private static final int RC_SIGN_IN = 131;
 
 //    ****************  Firebase Objects *****************************************
     private FirebaseAuth mFirebaseAuth;
@@ -183,6 +184,19 @@ public class MainActivity extends AppCompatActivity {
             case R.id.sign_out:
                 AuthUI.getInstance().signOut(this);
                 return true;
+            case R.id.check_in:
+                TextView view = (TextView)findViewById(R.id.check_in);
+                Intent intent = new Intent();
+                intent.putExtra(CheckIn.UID, currentUser.getUid());
+                if(view.getText().equals(R.string.check_in)) {
+                    intent.putExtra(CheckIn.FUNCTIONALITY, CheckIn.CHECK_IN);
+                    startActivity(intent);
+                }
+                else
+                {
+                    intent.putExtra(CheckIn.FUNCTIONALITY, CheckIn.CHECK_OUT);
+                    startActivity(intent);
+                }
             default:
                 return super.onOptionsItemSelected(item);
         }
