@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import layout.TransactionsFrag;
+
 /**
  * Created by SUYASH KUMAR on 2/10/2017.
  */
@@ -18,11 +20,22 @@ public class AppPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        Fragment fragment = new FriendsFrag();
-        Bundle args = new Bundle();
-        // Our object is just an integer :-P
-        args.putInt(FriendsFrag.ARG_OBJECT, position + 1);
-        fragment.setArguments(args);
+        Fragment fragment;
+
+        switch(position) {
+
+            case 0:
+                fragment = new FriendsFrag();
+                break;
+            case 1:
+                fragment = new ChatsFrag();
+                break;
+            case 2:
+                fragment = new TransactionsFrag();
+                break;
+            default:
+                fragment = null;
+        }
         return fragment;
     }
 

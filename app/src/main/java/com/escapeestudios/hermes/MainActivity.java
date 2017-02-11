@@ -3,7 +3,9 @@ package com.escapeestudios.hermes;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 //    ****************  Activity Objects  ****************************************
     private Context ctx;
     private String mUserName;
+    ActionBar actionBar;
 
 //    ****************  View Objects **********************************************
     private ViewPager mViewPager;
@@ -45,12 +48,44 @@ public class MainActivity extends AppCompatActivity {
         ctx = this.getApplicationContext();
 
 //        ************** Pager Code *******************************
-
+        actionBar = getSupportActionBar();
         mAppPagerAdapter =
                 new AppPagerAdapter(
                         getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mAppPagerAdapter);
+        mViewPager.setOnPageChangeListener(
+                new ViewPager.SimpleOnPageChangeListener() {
+                    @Override
+                    public void onPageSelected(int position) {
+                        // When swiping between pages, select the
+                        // corresponding tab.
+                        actionBar.setSelectedNavigationItem(position);
+                    }
+                });
+
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        // Create a tab listener that is called when the user changes tabs.
+        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // show the given tab
+                mViewPager.setCurrentItem(tab.getPosition());
+            }
+
+            public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // hide the given tab
+            }
+
+            public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // probably ignore this event
+            }
+        };
+
+        addTab("Friends", tabListener);
+        addTab("Chats", tabListener);
+        addTab("Activity", tabListener);
+
 
 //        ************** All Firebase initialisations ***************
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -147,6 +182,15 @@ public class MainActivity extends AppCompatActivity {
     private void onSignedOutCleanUp()
     {
         mUserName = ANONYMOUS;
+    }
+
+    private void addTab(String str, ActionBar.TabListener tabListener)
+    {
+        actionBar.addTab(
+                actionBar.newTab()
+                        .setText(str)
+                        .setTabListener(tabListener));
+
     }
 }
 
