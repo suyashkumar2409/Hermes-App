@@ -17,6 +17,11 @@ import com.facebook.appevents.AppEventsLogger;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
 
@@ -28,6 +33,10 @@ public class MainActivity extends AppCompatActivity {
 //    ****************  Firebase Objects *****************************************
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private FirebaseUser currentUser;
+
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mUserDatabase;
 
 //    ****************  Activity Objects  ****************************************
     private Context ctx;
@@ -89,11 +98,14 @@ public class MainActivity extends AppCompatActivity {
 
 //        ************** All Firebase initialisations ***************
         mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+
+        mUserDatabase = mFirebaseDatabase.getReference("users");
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+                currentUser = firebaseAuth.getCurrentUser();
 
                 if(currentUser != null)
                 {
@@ -147,6 +159,8 @@ public class MainActivity extends AppCompatActivity {
             if(resultCode == RESULT_OK)
             {
                 Toast.makeText(ctx, "Signed in",Toast.LENGTH_SHORT).show();
+
+
             }
             else if(resultCode == RESULT_CANCELED)
             {
@@ -176,12 +190,37 @@ public class MainActivity extends AppCompatActivity {
     private void onSignedInInitialise(String userName)
     {
         mUserName = userName;
-
+        Toast.makeText(ctx, userName, Toast.LENGTH_SHORT).show();
+        checkUserInDatabase();
     }
 
     private void onSignedOutCleanUp()
     {
         mUserName = ANONYMOUS;
+    }
+
+    private void checkUserInDatabase()
+    {
+        final User user = new User(currentUser.getUid(), currentUser.getDisplayName(), currentUser.getEmail());
+        mUserDatabase.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists())
+                {
+                    mUserDatabase.child(user.getUid()).setValue(user);
+                    Toast.makeText(ctx, "New User Added",Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(ctx, "User Exists",Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void addTab(String str, ActionBar.TabListener tabListener)
