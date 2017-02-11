@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private Context ctx;
     private String mUserName;
     ActionBar actionBar;
+    private Menu menu;
 
 //    ****************  View Objects **********************************************
     private ViewPager mViewPager;
@@ -173,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu,menu);
+        this.menu = menu;
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -185,17 +187,18 @@ public class MainActivity extends AppCompatActivity {
                 AuthUI.getInstance().signOut(this);
                 return true;
             case R.id.check_in:
-                TextView view = (TextView)findViewById(R.id.check_in);
-                Intent intent = new Intent();
+                Intent intent = new Intent(this, CheckIn.class);
                 intent.putExtra(CheckIn.UID, currentUser.getUid());
-                if(view.getText().equals(R.string.check_in)) {
+                if(item.getTitle().equals("Check In")) {
                     intent.putExtra(CheckIn.FUNCTIONALITY, CheckIn.CHECK_IN);
                     startActivity(intent);
+                    item.setTitle("Check Out");
                 }
                 else
                 {
                     intent.putExtra(CheckIn.FUNCTIONALITY, CheckIn.CHECK_OUT);
                     startActivity(intent);
+                    item.setTitle("Check In");
                 }
             default:
                 return super.onOptionsItemSelected(item);

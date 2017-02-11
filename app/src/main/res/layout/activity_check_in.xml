@@ -30,7 +30,6 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/check_in_submit"
-        android:text="@string/check_in_submit"
-        android:onClick="checkInButtonClicked"/>
+        android:text="@string/check_in_submit" />
 
 </RelativeLayout>
