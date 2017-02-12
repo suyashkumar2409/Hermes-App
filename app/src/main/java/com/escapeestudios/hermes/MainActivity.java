@@ -22,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mUserDatabase;
+    private DatabaseReference mCheckInDatabase;
 
 //    ****************  Activity Objects  ****************************************
     private Context ctx;
@@ -103,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
 
         mUserDatabase = mFirebaseDatabase.getReference("users");
+        mCheckInDatabase = mFirebaseDatabase.getReference("checkin");
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -125,8 +128,12 @@ public class MainActivity extends AppCompatActivity {
                                     .build(),
                             RC_SIGN_IN);
                 }
+
+
             }
         };
+
+
 
 
 
@@ -136,6 +143,29 @@ public class MainActivity extends AppCompatActivity {
 //        Required for facebook sdk init
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
+    }
+
+    private void updateCheckInStatus()
+    {
+        mCheckInDatabase.orderByChild("uid").equalTo(currentUser.getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists())
+                        {
+                            menu.findItem(R.id.check_in).setTitle("Check Out");
+                        }
+                        else
+                        {
+                            menu.findItem(R.id.check_in).setTitle("Check In");
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     @Override
@@ -192,13 +222,11 @@ public class MainActivity extends AppCompatActivity {
                 if(item.getTitle().equals("Check In")) {
                     intent.putExtra(CheckIn.FUNCTIONALITY, CheckIn.CHECK_IN);
                     startActivity(intent);
-                    item.setTitle("Check Out");
                 }
                 else
                 {
                     intent.putExtra(CheckIn.FUNCTIONALITY, CheckIn.CHECK_OUT);
                     startActivity(intent);
-                    item.setTitle("Check In");
                 }
             default:
                 return super.onOptionsItemSelected(item);
@@ -209,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
         mUserName = userName;
         Toast.makeText(ctx, userName, Toast.LENGTH_SHORT).show();
         checkUserInDatabase();
+        updateCheckInStatus();
     }
 
     private void onSignedOutCleanUp()
@@ -225,11 +254,12 @@ public class MainActivity extends AppCompatActivity {
                 if(!dataSnapshot.exists())
                 {
                     mUserDatabase.child(user.getUid()).setValue(user);
-                    Toast.makeText(ctx, "New User Added",Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(ctx, "New User Added",Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
-                    Toast.makeText(ctx, "User Exists",Toast.LENGTH_SHORT).show();
+                    ;
+//                    Toast.makeText(ctx, "User Exists",Toast.LENGTH_SHORT).show();
                 }
             }
 
