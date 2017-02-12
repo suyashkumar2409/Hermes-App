@@ -5,16 +5,19 @@
     tools:context="com.escapeestudios.hermes.FriendsFrag">
 
     <!-- TODO: Update blank fragment layout -->
-    <ScrollView
+    <ListView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/friends_list"
+        >
+
+    </ListView>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/friends_no_friends"
             android:text="@string/friends_no_friends"
             android:visibility="gone"/>
-    </ScrollView>
 
     <Button
         android:id="@+id/friends_search_friends"

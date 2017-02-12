@@ -12,6 +12,7 @@
     <!-- ************  Profile *********************-->
     <string name="profile_send">Send Friend Request</string>
     <string name="profile_sent">Friend Request Sent</string>
+    <string name="profile_friends">Currently Friends</string>
     <!--********** Facebook Login Essentials ************-->
     <string name="facebook_app_id">141191076393885</string>
     <string name="fb_login_protocol_scheme">fb141191076393885</string>
