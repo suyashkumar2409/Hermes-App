@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 //    ****************  Firebase Objects *****************************************
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-    private FirebaseUser currentUser;
+    public static FirebaseUser currentUser;
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mUserDatabase;

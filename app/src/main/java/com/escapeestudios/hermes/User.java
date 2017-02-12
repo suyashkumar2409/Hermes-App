@@ -15,6 +15,8 @@ public class User {
         this.email = email;
     }
 
+    public User(){}
+
     public void setUid(String uid) {
         this.uid = uid;
     }
@@ -40,5 +42,5 @@ public class User {
         return email;
     }
 
-
+    public String toString() { return email; }
 }

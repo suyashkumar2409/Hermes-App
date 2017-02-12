@@ -41,7 +41,9 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-        <activity android:name=".CheckIn"></activity>
+        <activity android:name=".CheckIn" />
+        <activity android:name=".SearchFriends" />
+        <activity android:name=".Profile"></activity>
     </application>
 
 </manifest>
