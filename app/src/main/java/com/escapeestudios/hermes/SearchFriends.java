@@ -69,13 +69,13 @@ public class SearchFriends extends AppCompatActivity {
         });
 
 
-        mDatabaseReference.orderByChild(NAME)
-                .addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.orderByChild(NAME).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for(DataSnapshot snapshot: dataSnapshot.getChildren())
                         {
                             User user = snapshot.getValue(User.class);
+                            if(!user.getUid().equals(MainActivity.currentUser.getUid()))
                             arrayList.add(user);
                             Toast.makeText(SearchFriends.this, "added",Toast.LENGTH_SHORT).show();
                         }
@@ -90,8 +90,10 @@ public class SearchFriends extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
                 Intent intent = new Intent(SearchFriends.this, Profile.class);
-                intent.putExtra(Profile.UID, arrayList.get(position).getUid());
+
+                intent.putExtra(Profile.UID, arrayList.get((int)id).getUid());
 
                 startActivity(intent);
             }

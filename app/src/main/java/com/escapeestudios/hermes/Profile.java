@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,6 +36,7 @@ public class Profile extends AppCompatActivity {
     private TextView profile_name;
     private TextView profile_email;
     private Button profile_button;
+
 
     private String uid;
     @Override
@@ -78,105 +80,82 @@ public class Profile extends AppCompatActivity {
 
         });
 
-        Query queryCreator = mFriendshipDatabase.orderByChild("creator").equalTo(MainActivity.currentUser.getUid());
-        Query queryAcceptor = mFriendshipDatabase.orderByChild("acceptor").equalTo(MainActivity.currentUser.getUid());
-
         profile_button.setVisibility(View.VISIBLE);
         currentlyFriends.setVisibility(View.GONE);
         profile_button.setText(SEND_REQUEST);
         profile_button.setEnabled(true);
 
-        queryCreator.addListenerForSingleValueEvent(new ValueEventListener() {
+        Query queryFriends = mUserDatabase.child(MainActivity.currentUser.getUid()).child("friends");
+
+        queryFriends.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-//                    Toast.makeText(CheckIn.this, dataSnapshot.getValue().toString(), Toast.LENGTH_SHORT).show();
-                for (DataSnapshot snap : dataSnapshot.getChildren()) {
-                    Friendship dat = snap.getValue(Friendship.class);
-                    if(dat.getAcceptor().equals(uid))
-                    {
-                        if(dat.getStatus().equals("accepted"))
-                        {
-                            profile_button.setVisibility(View.GONE);
-                            currentlyFriends.setVisibility(View.VISIBLE);
-                        }
-                        else
-                        {
-                            profile_button.setVisibility(View.VISIBLE);
-                            profile_button.setText(SENT_REQUEST);
-                            profile_button.setEnabled(false);
-                        }
-                    }
-                }
-//                    Toast.makeText(CheckIn.this, "AT", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(Profile.this,"oy",Toast.LENGTH_SHORT).show();
 
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-
-
-        });
-
-        queryAcceptor.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-//                    Toast.makeText(CheckIn.this, dataSnapshot.getValue().toString(), Toast.LENGTH_SHORT).show();
-                for (DataSnapshot snap : dataSnapshot.getChildren()) {
-                    Friendship dat = snap.getValue(Friendship.class);
-                    if(dat.getCreator().equals(uid))
-                    {
-                        if(dat.getStatus().equals("accepted"))
-                        {
-                            profile_button.setVisibility(View.GONE);
-                            currentlyFriends.setVisibility(View.VISIBLE);
-                        }
-                        else
-                        {
-                            profile_button.setVisibility(View.VISIBLE);
-                            profile_button.setText(ACCEPT_REQUEST);
-                            profile_button.setEnabled(true);
-                        }
-                    }
-                }
-//                    Toast.makeText(CheckIn.this, "AT", Toast.LENGTH_SHORT).show();
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-
-
-        });
-
-        profile_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (profile_button.getText().toString())
+                if(dataSnapshot!=null)
+                    Outer:
+                for(DataSnapshot snap : dataSnapshot.getChildren())
                 {
-                    case SEND_REQUEST:
-                        mFriendshipDatabase.push().setValue(new Friendship(MainActivity.currentUser.getUid(),uid,"sent"));
-                        profile_button.setText(SENT_REQUEST);
-                        profile_button.setEnabled(false);
-                        break;
-                    case ACCEPT_REQUEST:
-                        Query query = mFriendshipDatabase.orderByChild("acceptor").equalTo(MainActivity.currentUser.getUid());
-                        query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    if(snap!=null)
+                    {
+                        Query queryFriendship = mFriendshipDatabase.orderByKey().equalTo(snap.getValue().toString());
+                        queryFriendship.addChildEventListener(new ChildEventListener() {
                             @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-//                    Toast.makeText(CheckIn.this, dataSnapshot.getValue().toString(), Toast.LENGTH_SHORT).show();
-                                for (DataSnapshot snap : dataSnapshot.getChildren()) {
-                                    Friendship dat = snap.getValue(Friendship.class);
-                                    if(dat.getCreator().equals(uid)) {
-                                        dat.setStatus("accepted");
-                                        snap.getRef().setValue(dat);
-                                        break;
+                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                Friendship data = dataSnapshot.getValue(Friendship.class);
+                                if(data.getCreator().equals(MainActivity.currentUser.getUid()) && data.getAcceptor().equals(uid))
+                                {
+//                                    Toast.makeText(Profile.this,"hi",Toast.LENGTH_SHORT).show();
+                                    if(data.getStatus().equals("accepted"))
+                                    {
+                                        profile_button.setVisibility(View.GONE);
+                                        currentlyFriends.setVisibility(View.VISIBLE);
+                                    }
+                                    else if(data.getStatus().equals("sent"))
+                                    {
+                                        profile_button.setText(SENT_REQUEST);
+                                        profile_button.setEnabled(false);
+                                        profile_button.setVisibility(View.VISIBLE);
+                                        currentlyFriends.setVisibility(View.GONE);
+                                    }
+//                                    break Outer;
+                                }
+                                else if(data.getAcceptor().equals(MainActivity.currentUser.getUid()) && data.getCreator().equals(uid))
+                                {
+//                                    Toast.makeText(Profile.this,"hello",Toast.LENGTH_SHORT).show();
+
+                                    if(data.getStatus().equals("accepted"))
+                                    {
+                                        profile_button.setVisibility(View.GONE);
+                                        currentlyFriends.setVisibility(View.VISIBLE);
+                                    }
+                                    else if(data.getStatus().equals("sent"))
+                                    {
+                                        profile_button.setText(ACCEPT_REQUEST);
+                                        profile_button.setEnabled(true);
+                                        profile_button.setVisibility(View.VISIBLE);
+                                        currentlyFriends.setVisibility(View.GONE);
                                     }
                                 }
-//                    Toast.makeText(CheckIn.this, "AT", Toast.LENGTH_SHORT).show();
+                                else
+                                {
+//                                    Toast.makeText(Profile.this,"damn",Toast.LENGTH_SHORT).show();
+
+                                }
+                            }
+
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                            }
+
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                            }
+
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
                             }
 
@@ -184,8 +163,139 @@ public class Profile extends AppCompatActivity {
                             public void onCancelled(DatabaseError databaseError) {
 
                             }
+                        });
+                    }
 
+                }
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+//        Query queryCreator = mFriendshipDatabase.orderByChild("creator").equalTo(MainActivity.currentUser.getUid());
+//        Query queryAcceptor = mFriendshipDatabase.orderByChild("acceptor").equalTo(MainActivity.currentUser.getUid());
+//
+//
+//        queryCreator.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+////                    Toast.makeText(CheckIn.this, dataSnapshot.getValue().toString(), Toast.LENGTH_SHORT).show();
+//                for (DataSnapshot snap : dataSnapshot.getChildren()) {
+//                    Friendship dat = snap.getValue(Friendship.class);
+//                    if(dat.getAcceptor().equals(uid))
+//                    {
+//                        if(dat.getStatus().equals("accepted"))
+//                        {
+//                            profile_button.setVisibility(View.GONE);
+//                            currentlyFriends.setVisibility(View.VISIBLE);
+//                        }
+//                        else
+//                        {
+//                            profile_button.setVisibility(View.VISIBLE);
+//                            profile_button.setText(SENT_REQUEST);
+//                            profile_button.setEnabled(false);
+//                        }
+//                    }
+//                }
+////                    Toast.makeText(CheckIn.this, "AT", Toast.LENGTH_SHORT).show();
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//
+//
+//        });
+//
+//        queryAcceptor.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+////                    Toast.makeText(CheckIn.this, dataSnapshot.getValue().toString(), Toast.LENGTH_SHORT).show();
+//                for (DataSnapshot snap : dataSnapshot.getChildren()) {
+//                    Friendship dat = snap.getValue(Friendship.class);
+//                    if(dat.getCreator().equals(uid))
+//                    {
+//                        if(dat.getStatus().equals("accepted"))
+//                        {
+//                            profile_button.setVisibility(View.GONE);
+//                            currentlyFriends.setVisibility(View.VISIBLE);
+//                        }
+//                        else
+//                        {
+//                            profile_button.setVisibility(View.VISIBLE);
+//                            profile_button.setText(ACCEPT_REQUEST);
+//                            profile_button.setEnabled(true);
+//                        }
+//                    }
+//                }
+////                    Toast.makeText(CheckIn.this, "AT", Toast.LENGTH_SHORT).show();
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//
+//
+//        });
+
+        profile_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (profile_button.getText().toString())
+                {
+                    case SEND_REQUEST:
+                        DatabaseReference temp = mFriendshipDatabase.push();
+                        temp.setValue(new Friendship(MainActivity.currentUser.getUid(),uid,"sent"));
+
+                        mUserDatabase.child(MainActivity.currentUser.getUid() + "/friends")
+                                .push().setValue(temp.getKey());
+
+                        mUserDatabase.child(uid+"/friends")
+                                .push().setValue(temp.getKey());
+
+                        profile_button.setText(SENT_REQUEST);
+                        profile_button.setEnabled(false);
+                        break;
+                    case ACCEPT_REQUEST:
+                        mUserDatabase.child(uid).child("friends").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for(DataSnapshot snap:dataSnapshot.getChildren())
+                                {
+                                    final String tempID = snap.getValue().toString();
+                                    mFriendshipDatabase.child(tempID).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            Friendship data = dataSnapshot.getValue(Friendship.class);
+                                            if((data.getCreator().equals(MainActivity.currentUser.getUid()) && data.getAcceptor().equals(uid))
+                                                    ||(data.getAcceptor().equals(MainActivity.currentUser.getUid()) && data.getCreator().equals(uid)))
+
+                                            {
+                                                mFriendshipDatabase.child(tempID).child("status").setValue("accepted");
+//                                    break Outer;
+                                            }
+
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
                         });
 
                         profile_button.setVisibility(View.GONE);

@@ -1,5 +1,7 @@
 package com.escapeestudios.hermes;
 
+import java.util.ArrayList;
+
 /**
  * Created by SUYASH KUMAR on 2/11/2017.
  */
@@ -8,7 +10,6 @@ public class User {
     private String uid;
     private String name;
     private String email;
-
     public User(String uid, String name, String email) {
         this.uid = uid;
         this.name = name;
@@ -16,6 +17,12 @@ public class User {
     }
 
     public User(){}
+    public User(User user)
+    {
+        this.uid = user.uid;
+        this.name= user.name;
+        this.email = user.email;
+    }
 
     public void setUid(String uid) {
         this.uid = uid;
