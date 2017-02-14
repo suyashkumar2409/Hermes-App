@@ -146,6 +146,7 @@ public class FriendsFrag extends Fragment {
                                                                 for (DataSnapshot checkinsnap : dataSnapshot.getChildren()) {
                                                                     CheckInData checkInData = checkinsnap.getValue(CheckInData.class);
                                                                     userExtra.setCheckInPlace(checkInData.getPlace());
+                                                                    Toast.makeText(getContext(),"here",Toast.LENGTH_SHORT).show();
                                                                 }
                                                             }
 

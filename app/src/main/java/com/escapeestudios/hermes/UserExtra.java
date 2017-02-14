@@ -13,7 +13,14 @@ public class UserExtra extends User {
     {
         super(user);
     }
-    private String checkInPlace;
+    public String toString()
+    {
+        if(!checkInPlace.equals(""))
+            return super.toString() + " checked in - " + checkInPlace;
+        else
+            return super.toString();
+    }
+    private String checkInPlace = "";
 
     public String getCheckInPlace() {
         return checkInPlace;
