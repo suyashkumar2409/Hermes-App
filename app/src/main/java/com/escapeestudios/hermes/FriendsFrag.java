@@ -4,6 +4,7 @@ package com.escapeestudios.hermes;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,7 +33,9 @@ public class FriendsFrag extends Fragment {
     DatabaseReference mUsersDatabase;
     DatabaseReference mCheckinDatabase;
 
-    private ArrayList<UserExtra> friends;
+    private static boolean populated;
+    private ArrayList<UserExtra> friends = new ArrayList<>();
+    private View rootView;
     private ArrayAdapter adapter;
     public static final String FRIENDSHIP= "friendship";
     public static final String USERS = "users";
@@ -46,7 +50,9 @@ public class FriendsFrag extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        View rootView =  inflater.inflate(R.layout.fragment_friends, container, false);
+        rootView =  inflater.inflate(R.layout.fragment_friends, container, false);
+
+        populated = false;
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFriendshipDatabase = mFirebaseDatabase.getReference().child(FRIENDSHIP);
@@ -63,60 +69,107 @@ public class FriendsFrag extends Fragment {
         });
 
 
-        ((TextView)rootView.findViewById(R.id.friends_no_friends)).setVisibility(View.VISIBLE);
 
-        adapter = new ArrayAdapter(getContext(), (ListView)rootView.findViewById(R.id.f))
+
+        adapter = new ArrayAdapter(getContext(),android.R.layout.simple_list_item_1, friends);
+        ListView listView =  (ListView)rootView.findViewById(R.id.friends_list);
+        listView.setAdapter(adapter);
+        listView.setClickable(false);
         return rootView;
     }
 
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
-        if(MainActivity.currentUser!=null)
-        {
+        friends.clear();
+//        if (populated == false) {
             populateFriends();
+//        }
+
+
+    }
+
+    private void refreshLook()
+    {
+        Toast.makeText(getContext(),"hello",Toast.LENGTH_SHORT).show();
+        if(friends.size()==0)
+        {
+            Toast.makeText(getContext(),"hi",Toast.LENGTH_SHORT).show();
+
+            ((TextView)rootView.findViewById(R.id.friends_no_friends)).setVisibility(View.VISIBLE);
+            ((ListView)rootView.findViewById(R.id.friends_list)).setVisibility(View.GONE);
+        }
+        else
+        {
+            ((TextView)rootView.findViewById(R.id.friends_no_friends)).setVisibility(View.GONE);
+            ((ListView)rootView.findViewById(R.id.friends_list)).setVisibility(View.VISIBLE);
         }
 
     }
 
     private void populateFriends()
     {
+        Toast.makeText(getContext(),"happ",Toast.LENGTH_SHORT).show();
         mUsersDatabase.child(MainActivity.currentUser.getUid()).child("friends")
         .addListenerForSingleValueEvent(new ValueEventListener(){
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot snap:dataSnapshot.getChildren())
+                for(final DataSnapshot snap:dataSnapshot.getChildren())
                 {
                     mFirebaseDatabase.getReference().child("friendship").child(snap.getValue().toString())
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            for(DataSnapshot snapshot: dataSnapshot.getChildren())
-                            {
-                                final UserExtra userExtra;
-                                User temp = snapshot.getValue(User.class);
 
-                                userExtra = new UserExtra(temp);
-                                mFirebaseDatabase.getReference().child("checkin").orderByChild("uid").equalTo(temp.getUid())
-                                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                                for(DataSnapshot checkinsnap:dataSnapshot.getChildren())
-                                                {
-                                                    CheckInData checkInData = checkinsnap.getValue(CheckInData.class);
-                                                    userExtra.setCheckInPlace(checkInData.getPlace());
-                                                }
-                                            }
+                                Query querytemp;
+                                Log.e("Prob",dataSnapshot.toString());
+                                Friendship temp = dataSnapshot.getValue(Friendship.class);
+                                if (temp.getStatus().equals("accepted")) {
+                                    if (temp.getCreator().equals(MainActivity.currentUser.getUid())) {
+                                        querytemp = mUsersDatabase.child(temp.getAcceptor());
+                                    } else {
+                                        querytemp = mUsersDatabase.child(temp.getCreator());
+                                    }
 
-                                            @Override
-                                            public void onCancelled(DatabaseError databaseError) {
+                                    querytemp.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                            }
-                                        });
+                                                final UserExtra userExtra;
+                                                User temp = dataSnapshot.getValue(User.class);
 
-                                friends.add(userExtra);
-                            }
+                                                userExtra = new UserExtra(temp);
+                                                mFirebaseDatabase.getReference().child("checkin").orderByChild("uid").equalTo(temp.getUid())
+                                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                for (DataSnapshot checkinsnap : dataSnapshot.getChildren()) {
+                                                                    CheckInData checkInData = checkinsnap.getValue(CheckInData.class);
+                                                                    userExtra.setCheckInPlace(checkInData.getPlace());
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(DatabaseError databaseError) {
+
+                                                            }
+                                                        });
+
+                                                friends.add(userExtra);
+                                            refreshLook();
+                                            populated = true;
+                                            adapter.notifyDataSetChanged();
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
+
+                                }
+
+
                         }
 
                         @Override
@@ -125,6 +178,7 @@ public class FriendsFrag extends Fragment {
                         }
                     });
                 }
+
             }
 
             @Override
@@ -132,5 +186,6 @@ public class FriendsFrag extends Fragment {
 
             }
         });
+
     }
 }
