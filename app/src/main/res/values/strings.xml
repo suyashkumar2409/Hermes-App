@@ -25,4 +25,20 @@
     <string name="check_in_submit">Check In</string>
     <string name="check_out_submit">Check Out</string>
 
+    <!-- ********* Transactions Activity ************ -->
+    <string name="trans_frag_add_button_tag">Add</string>
+
+    <!-- ********* ToAdd class ****************** -->
+    <string name="toAdd_with_tag">Between you and : </string>
+    <string name="toAdd_amount_tag">Amount : </string>
+    <string name="toAdd_WithWhom_hint">Name or email address</string>
+    <string name="toAdd_Description_text_tag">Description : </string>
+    <string-array name="toAdd_owing_list">
+        <item>I owe him</item>
+        <item>He owes me</item>
+        <item>Split Equally</item>
+    </string-array>
+    <string name="toAdd_submit_button_tag">Submit</string>
+
+
 </resources>

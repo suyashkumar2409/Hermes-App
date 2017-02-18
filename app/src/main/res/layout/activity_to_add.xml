@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_to_add"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.escapeestudios.hermes.toAdd">
+
+    <TextView
+        android:id="@+id/toAdd_with_tag"
+        android:layout_marginLeft="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height= "wrap_content"
+        android:text="@string/toAdd_with_tag" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/toAdd_toWhom_tag"
+        android:layout_alignBaseline="@id/toAdd_with_tag"
+        android:layout_toRightOf="@id/toAdd_with_tag"
+        android:hint="@string/toAdd_WithWhom_hint"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:id="@+id/toAdd_description_text_tag"
+        android:layout_marginTop="10dp"
+        android:layout_alignLeft="@id/toAdd_with_tag"
+        android:layout_below="@id/toAdd_with_tag"
+        android:layout_width="wrap_content"
+        android:layout_height= "wrap_content"
+        android:text="@string/toAdd_Description_text_tag" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/toAdd_description_val"
+        android:layout_alignBaseline="@id/toAdd_description_text_tag"
+        android:layout_toRightOf="@id/toAdd_description_text_tag"
+        android:layout_below="@id/toAdd_with_tag"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:id="@+id/toAdd_amount_tag"
+        android:layout_marginTop="10dp"
+        android:layout_alignLeft="@id/toAdd_with_tag"
+        android:layout_below="@id/toAdd_description_text_tag"
+        android:layout_width="wrap_content"
+        android:layout_height= "wrap_content"
+        android:text="@string/toAdd_amount_tag" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/toAdd_amount_val"
+        android:inputType="numberDecimal"
+        android:layout_alignBaseline="@id/toAdd_amount_tag"
+        android:layout_toRightOf="@id/toAdd_amount_tag"
+        android:layout_alignParentEnd="true"
+        android:hint="0" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/toAdd_owing_list"
+        android:layout_marginTop="10dp"
+        android:layout_below="@id/toAdd_amount_tag"
+        android:entries="@array/toAdd_owing_list"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toAdd_owing_list"
+        android:layout_marginTop="10dp"
+        android:text="@string/toAdd_submit_button_tag"
+        android:id="@+id/toAdd_submit_button" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/toAdd_error_val"
+        android:textColor="@color/toAdd_error"
+        android:layout_below="@id/toAdd_submit_button"
+        android:layout_alignLeft="@id/toAdd_with_tag"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>

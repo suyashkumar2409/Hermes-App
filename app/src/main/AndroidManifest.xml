@@ -44,7 +44,8 @@
         <activity android:name=".CheckIn" />
         <activity android:name=".SearchFriends" />
         <activity android:name=".Profile" />
-        <activity android:name=".NewMessageActivity"></activity>
+        <activity android:name=".NewMessageActivity" />
+        <activity android:name=".toAdd_2"></activity>
     </application>
 
 </manifest>
