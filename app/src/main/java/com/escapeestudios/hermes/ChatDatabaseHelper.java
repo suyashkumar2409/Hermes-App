@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class ChatDatabaseHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "HERMESDATABASE";
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 2;
 
     public static final String chatTable = "CHATTABLE";
     public static final String messageTable = "MESSAGETABLE";
@@ -42,13 +42,13 @@ public class ChatDatabaseHelper extends SQLiteOpenHelper {
     {
         if(oldVersion < 1)
         {
-            db.execSQL("CREATE TABLE "+ chatTable + "(_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+            db.execSQL("CREATE TABLE "+ chatTable + "( _id INTEGER PRIMARY KEY AUTOINCREMENT, "
             + FRIENDUID +" TEXT, "
             + FRIENDNAME + " TEXT, "
             + LASTMESSAGE + " TEXT, "
             + LASTMESSAGETIME + " TEXT);");
 
-            db.execSQL("CREATE TABLE "+ messageTable + "(_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+            db.execSQL("CREATE TABLE "+ messageTable + "( _id INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + FRIENDUID + " TEXT, "
                     + FRIENDNAME + " TEXT, "
                     + MESSAGE + " TEXT, "
@@ -57,7 +57,10 @@ public class ChatDatabaseHelper extends SQLiteOpenHelper {
 
             MessageData temp = new MessageData("2Lwa9TtcFeaOm2J4MsuaTgP48qi1", "Suyash Kumar", "Hi", 0, "0");
             insertMessage(db, temp);
-
+        }
+        else if(oldVersion < 2)
+        {
+            db.execSQL("ALTER TABLE " + chatTable + "ADD UNIQUE ( " + FRIENDUID + " );" );
         }
     }
 

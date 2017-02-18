@@ -15,11 +15,12 @@
         android:hint="Write a message"
         android:id="@+id/chat_write_message"/>
 
-    <ImageView
+    <ImageButton
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="5"
         android:padding="4dp"
         android:src="@android:drawable/ic_menu_send"
-        android:id="@+id/chat_send_message"/>
+        android:id="@+id/chat_send_message"
+        />
 </LinearLayout>
