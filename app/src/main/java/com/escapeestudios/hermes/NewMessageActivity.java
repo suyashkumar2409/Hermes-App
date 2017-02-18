@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Calendar;
 
@@ -48,7 +49,7 @@ public class NewMessageActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mChatDatabase;
-    private ChildEventListener chatChildEventListener;
+    private ValueEventListener chatChildEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +116,7 @@ public class NewMessageActivity extends AppCompatActivity {
     {
 
             mChatDatabase.orderByChild("receiverUID").equalTo(MainActivity.currentUser.getUid())
-                    .addChildEventListener(chatChildEventListener);
+                    .addValueEventListener(chatChildEventListener);
 
     }
 
@@ -180,10 +181,12 @@ public class NewMessageActivity extends AppCompatActivity {
 
         if(chatChildEventListener == null)
         {
-            chatChildEventListener = new ChildEventListener() {
+            chatChildEventListener = new ValueEventListener() {
                 @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    ChatOnlineData data = dataSnapshot.getValue(ChatOnlineData.class);
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot datasnap: dataSnapshot.getChildren())
+                    {
+                        ChatOnlineData data = datasnap.getValue(ChatOnlineData.class);
                     int senderSelf;
                     MessageData messageData;
                     ChatData chatData;
@@ -219,22 +222,11 @@ public class NewMessageActivity extends AppCompatActivity {
 //                    adapter.notifyDataSetChanged();
                     dataSnapshot.getRef().removeValue();
 //
+                    }
 
-                }
-
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                }
-
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                }
-
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
+                    queryAgain();
+                    adapter.changeCursor(cursorMessages);
+                    adapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -242,6 +234,69 @@ public class NewMessageActivity extends AppCompatActivity {
 
                 }
             };
+
+//            chatChildEventListener = new ChildEventListener() {
+//                @Override
+//                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                    ChatOnlineData data = dataSnapshot.getValue(ChatOnlineData.class);
+//                    int senderSelf;
+//                    MessageData messageData;
+//                    ChatData chatData;
+//                    Calendar c = Calendar.getInstance();
+//
+//                    if(data.getSenderUID().equals(MainActivity.currentUser.getUid())) {
+//                        senderSelf = 1;
+//                        messageData = new MessageData(data.getReceiverUID(), data.getReceiverEmail(), data.getMessage(), senderSelf,
+//                                String.valueOf(c.getTimeInMillis()));
+//                        chatData = new ChatData(data.getReceiverUID(), data.getReceiverEmail(), data.getMessage(),
+//                                String.valueOf(c.getTimeInMillis()));
+//
+//                    }
+//                    else {
+//                        senderSelf = 0;
+//                        messageData = new MessageData(data.getSenderUID(), data.getSenderEmail(), data.getMessage(), senderSelf,
+//                                String.valueOf(c.getTimeInMillis()));
+//                        chatData = new ChatData(data.getSenderUID(), data.getSenderEmail(), data.getMessage(),
+//                                String.valueOf(c.getTimeInMillis()));
+//
+//                    }
+//
+//                    ChatDatabaseHelper.insertMessage(dbChat, messageData);
+//                    ContentValues chatValue = new ContentValues();
+//
+//                    chatValue.put(ChatDatabaseHelper.FRIENDUID, friendUID);
+//                    chatValue.put(ChatDatabaseHelper.FRIENDNAME, friendName);
+//                    chatValue.put(ChatDatabaseHelper.LASTMESSAGE, data.getMessage());
+//                    chatValue.put(ChatDatabaseHelper.LASTMESSAGETIME, data.getMessageTime());
+//
+//                    dbChat.replace(ChatDatabaseHelper.chatTable, null, chatValue);
+//
+////                    adapter.notifyDataSetChanged();
+//                    dataSnapshot.getRef().removeValue();
+////
+//
+//                }
+//
+//                @Override
+//                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//
+//                }
+//
+//                @Override
+//                public void onChildRemoved(DataSnapshot dataSnapshot) {
+//
+//                }
+//
+//                @Override
+//                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError databaseError) {
+//
+//                }
+//            };
 
         }
 
