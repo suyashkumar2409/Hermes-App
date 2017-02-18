@@ -28,7 +28,7 @@ public class ChatMessageAdapter extends ArrayAdapter<ChatMessage> {
             convertView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.single_message, parent, false);
         }
 
-        ImageView photoImageView = (ImageView) convertView.findViewById(R.id.photoImageView);
+        ImageView photoImageView = (ImageView) convertView.findViewById(R.id.sent_imageView2);
         TextView messageTextView = (TextView) convertView.findViewById(R.id.messageTextView);
         TextView authorTextView = (TextView) convertView.findViewById(R.id.nameTextView);
 

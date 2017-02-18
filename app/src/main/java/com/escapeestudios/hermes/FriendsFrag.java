@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -73,7 +74,21 @@ public class FriendsFrag extends Fragment {
         adapter = new ArrayAdapter(getContext(),android.R.layout.simple_list_item_1, friends);
         ListView listView =  (ListView)rootView.findViewById(R.id.friends_list);
         listView.setAdapter(adapter);
-        listView.setClickable(false);
+        listView.setClickable(true);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getActivity(), NewMessageActivity.class);
+                UserExtra extra = friends.get(position);
+                intent.putExtra(ChatsFrag.UID, extra.getUid());
+                intent.putExtra(ChatsFrag.NAME, extra.getName());
+
+                startActivity(intent);
+            }
+        });
+
+
         return rootView;
     }
 
