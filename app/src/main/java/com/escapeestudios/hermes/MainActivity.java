@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
         {
             if(resultCode == RESULT_OK)
             {
-                Toast.makeText(ctx, "Signed in",Toast.LENGTH_SHORT).show();
+//                Toast.makeText(ctx, "Signed in",Toast.LENGTH_SHORT).show();
 
 
             }
@@ -250,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
     private void onSignedInInitialise(String userName)
     {
         mUserName = userName;
-        Toast.makeText(ctx, userName, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(ctx, userName, Toast.LENGTH_SHORT).show();
         checkUserInDatabase();
         updateCheckInStatus();
         if(headerMade==false)

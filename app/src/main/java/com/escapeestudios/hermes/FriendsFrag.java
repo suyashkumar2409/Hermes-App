@@ -35,12 +35,14 @@ public class FriendsFrag extends Fragment {
     DatabaseReference mCheckinDatabase;
 
     private static boolean populated;
-    private ArrayList<UserExtra> friends = new ArrayList<>();
+    public static ArrayList<UserExtra> friends = new ArrayList<>();
     private View rootView;
     private ArrayAdapter adapter;
     public static final String FRIENDSHIP= "friendship";
     public static final String USERS = "users";
     public static final String CHECKIN = "checkin";
+
+    private ValueEventListener friendListener;
     public FriendsFrag() {
         // Required empty public constructor
     }
@@ -92,15 +94,15 @@ public class FriendsFrag extends Fragment {
         return rootView;
     }
 
-    public void onResume() {
-        super.onResume();
-        friends.clear();
-//        if (populated == false) {
-            populateFriends();
-//        }
-
-
-    }
+////    public void onResume() {
+//        super.onResume();
+//        friends.clear();
+////        if (populated == false) {
+//            populateFriends();
+////        }
+//
+//
+//    }
 
     private void refreshLook()
     {
@@ -120,41 +122,53 @@ public class FriendsFrag extends Fragment {
 
     }
 
-    private void populateFriends()
+    public void onPause()
     {
-//        Toast.makeText(getContext(),"happ",Toast.LENGTH_SHORT).show();
-        mUsersDatabase.child(MainActivity.currentUser.getUid()).child("friends")
-        .addListenerForSingleValueEvent(new ValueEventListener(){
+        super.onPause();
+        mUsersDatabase.child(MainActivity.currentUser.getUid()).child("friends").removeEventListener(friendListener);
+    }
+
+    public void onResume()
+    {
+        super.onResume();
+        if(friendListener==null)
+            createListener();
+        friends.clear();
+        mUsersDatabase.child(MainActivity.currentUser.getUid()).child("friends").addValueEventListener(friendListener);
+    }
+    private void createListener()
+    {
+        friendListener = new ValueEventListener(){
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(final DataSnapshot snap:dataSnapshot.getChildren())
                 {
                     mFirebaseDatabase.getReference().child("friendship").child(snap.getValue().toString())
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                Query querytemp;
-                                Log.e("Prob",dataSnapshot.toString());
-                                Friendship temp = dataSnapshot.getValue(Friendship.class);
-                                if (temp.getStatus().equals("accepted")) {
-                                    if (temp.getCreator().equals(MainActivity.currentUser.getUid())) {
-                                        querytemp = mUsersDatabase.child(temp.getAcceptor());
-                                    } else {
-                                        querytemp = mUsersDatabase.child(temp.getCreator());
-                                    }
+                                    Query querytemp;
+                                    Log.e("Prob",dataSnapshot.toString());
+                                    Friendship temp = dataSnapshot.getValue(Friendship.class);
+                                    if (temp.getStatus().equals("accepted")) {
+                                        if (temp.getCreator().equals(MainActivity.currentUser.getUid())) {
+                                            querytemp = mUsersDatabase.child(temp.getAcceptor());
+                                        } else {
+                                            querytemp = mUsersDatabase.child(temp.getCreator());
+                                        }
 
-                                    querytemp.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                        querytemp.addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
 
                                                 final UserExtra userExtra;
                                                 User temp = dataSnapshot.getValue(User.class);
 
                                                 userExtra = new UserExtra(temp);
                                                 mFirebaseDatabase.getReference().child("checkin").orderByChild("uid").equalTo(temp.getUid())
-                                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        .addValueEventListener(new ValueEventListener() {
                                                             @Override
                                                             public void onDataChange(DataSnapshot dataSnapshot) {
                                                                 for (DataSnapshot checkinsnap : dataSnapshot.getChildren()) {
@@ -170,28 +184,29 @@ public class FriendsFrag extends Fragment {
                                                             }
                                                         });
 
+                                                if(!friends.contains(userExtra))
                                                 friends.add(userExtra);
-                                            refreshLook();
-                                            populated = true;
-                                            adapter.notifyDataSetChanged();
-                                        }
+                                                refreshLook();
+                                                populated = true;
+                                                adapter.notifyDataSetChanged();
+                                            }
 
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
 
-                                        }
-                                    });
+                                            }
+                                        });
+
+                                    }
+
 
                                 }
 
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
 
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+                                }
+                            });
                 }
 
             }
@@ -200,7 +215,16 @@ public class FriendsFrag extends Fragment {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
-
+        };
     }
+//
+//    private void populateFriends()
+//    {
+////        Toast.makeText(getContext(),"happ",Toast.LENGTH_SHORT).show();
+//        mUsersDatabase.child(MainActivity.currentUser.getUid()).child("friends")
+//        .addValueEventListener(
+//
+//        );
+//
+//    }
 }

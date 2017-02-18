@@ -14,13 +14,22 @@ public class Transaction {
     private String whoOwesWho;
     private String description;
     private int amount;
+    private String creatorUID;
+    private String acceptorUID;
 
-    public Transaction(int amount, String name, String whoOwesWho, String Description) {
-        this.name = name;
-        this.amount = amount;
-        this.description = Description;
-        this.whoOwesWho = whoOwesWho;
+    public Transaction(){
+
     }
+
+    public Transaction(String name, String whoOwesWho, String description, int amount, String creatorUID, String acceptorUID) {
+        this.name = name;
+        this.whoOwesWho = whoOwesWho;
+        this.description = description;
+        this.amount = amount;
+        this.creatorUID = creatorUID;
+        this.acceptorUID = acceptorUID;
+    }
+
 
     public String toString() {
         String out = description + " between you and " + name + "\n";
@@ -46,5 +55,13 @@ public class Transaction {
 
     public String getWhoOwesWho() {
         return whoOwesWho;
+    }
+
+    public String getCreatorUID() {
+        return creatorUID;
+    }
+
+    public String getAcceptorUID() {
+        return acceptorUID;
     }
 }

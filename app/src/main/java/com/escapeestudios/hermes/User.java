@@ -49,5 +49,5 @@ public class User {
         return email;
     }
 
-    public String toString() { return email; }
+    public String toString() { return name; }
 }

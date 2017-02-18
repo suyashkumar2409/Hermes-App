@@ -17,12 +17,13 @@
         android:layout_height= "wrap_content"
         android:text="@string/toAdd_with_tag" />
 
-    <EditText
+    <AutoCompleteTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/toAdd_toWhom_tag"
         android:layout_alignBaseline="@id/toAdd_with_tag"
         android:layout_toRightOf="@id/toAdd_with_tag"
+        android:textAppearance="?android:textAppearanceSmall"
         android:hint="@string/toAdd_WithWhom_hint"
         android:layout_alignParentEnd="true" />
 
