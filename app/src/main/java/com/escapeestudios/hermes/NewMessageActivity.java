@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -23,18 +24,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
+import java.util.Calendar;
+
 public class NewMessageActivity extends AppCompatActivity {
 
     public static final String UID = "UID";
     public static final String NAME = "NAME";
 
-    public static boolean databaseSyncOn = false;
-
     private String friendUID;
     private String friendName;
-
-    private SQLiteOpenHelper chatDatabaseHelper;
-    private SQLiteDatabase dbChat;
+//
+//    private SQLiteOpenHelper chatDatabaseHelper;
+//    private SQLiteDatabase dbChat;
 
     private Cursor cursorMessages;
 
@@ -46,16 +47,20 @@ public class NewMessageActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mChatDatabase;
+    private ChildEventListener chatChildEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_message);
 
+
+//        Toast.makeText(this,String.valueOf(c.getTimeInMillis()),Toast.LENGTH_SHORT).show();
+
+
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mChatDatabase = mFirebaseDatabase.getReference("chats");
 
-        attachDatabaseListener();
 
 
         Intent intent = getIntent();
@@ -67,26 +72,26 @@ public class NewMessageActivity extends AppCompatActivity {
         messageText = (EditText)findViewById(R.id.chat_write_message);
         sendButton = (ImageButton)findViewById(R.id.chat_send_message);
 
-        messageText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-                if (charSequence.toString().trim().length() > 0) {
-                    sendButton.setEnabled(true);
-                } else {
-                    sendButton.setEnabled(false);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
+//        messageText.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+//                if (charSequence.toString().trim().length() > 0) {
+//                    sendButton.setEnabled(true);
+//                } else {
+//                    sendButton.setEnabled(false);
+//                }
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//
+//            }
+//        });
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,47 +99,124 @@ public class NewMessageActivity extends AppCompatActivity {
                 sendMessage();
             }
         });
+
+//        attachDatabaseListener();
+
+    }
+
+    public void onPause()
+    {
+        super.onPause();
+        mChatDatabase.removeEventListener(chatChildEventListener);
     }
 
     private void attachDatabaseListener()
     {
-        if(!databaseSyncOn)
+
+            mChatDatabase.orderByChild("receiverUID").equalTo(MainActivity.currentUser.getUid())
+                    .addChildEventListener(chatChildEventListener);
+
+    }
+
+    private void sendMessage()
+    {
+        Toast.makeText(this,"clicked",Toast.LENGTH_SHORT).show();
+        String message = messageText.getText().toString();
+        EditText editText = (EditText)findViewById(R.id.chat_write_message);
+        editText.setText("");
+        Calendar c = Calendar.getInstance();
+        pushToOnlineDatabase(message,c);
+//        updateChatTable(message,c);
+//        updateMessagesTable(message,c);
+
+    }
+
+    private void pushToOnlineDatabase(String message, Calendar c)
+    {
+        Query query = mChatDatabase.push();
+        ChatOnlineData onlineData = new ChatOnlineData(MainActivity.currentUser.getUid(),
+                friendUID,
+                message,
+                String.valueOf(c.getTimeInMillis()),
+                MainActivity.currentUser.getEmail(),
+                friendName);
+
+        query.getRef().setValue(onlineData);
+    }
+
+    private void updateMessagesTable(String message, Calendar c)
+    {
+        MessageData messageData;
+        messageData = new MessageData(friendUID, friendName, message, 1,
+                String.valueOf(c.getTimeInMillis()));
+//        ChatDatabaseHelper.insertMessage(dbChat, messageData, adapter);
+//        adapter.notifyDataSetChanged();
+    }
+
+
+    private void updateChatTable(String message, Calendar c)
+    {
+        ChatData chatData = new ChatData(friendUID, friendName, message,
+                String.valueOf(c.getTimeInMillis()));
+
+        ContentValues chatValue = new ContentValues();
+
+        chatValue.put(ChatDatabaseHelper.FRIENDUID, friendUID);
+        chatValue.put(ChatDatabaseHelper.FRIENDNAME, friendName);
+        chatValue.put(ChatDatabaseHelper.LASTMESSAGE, message);
+        chatValue.put(ChatDatabaseHelper.LASTMESSAGETIME, "0");
+
+//        dbChat.replace(ChatDatabaseHelper.chatTable, null, chatValue);
+
+    }
+
+    public void onResume()
+    {
+        super.onResume();
+        createCursorAndAdapter();
+
+        if(chatChildEventListener == null)
         {
-            mChatDatabase.addChildEventListener(new ChildEventListener() {
+            chatChildEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     ChatOnlineData data = dataSnapshot.getValue(ChatOnlineData.class);
                     int senderSelf;
                     MessageData messageData;
                     ChatData chatData;
+                    Calendar c = Calendar.getInstance();
+
                     if(data.getSenderUID().equals(MainActivity.currentUser.getUid())) {
                         senderSelf = 1;
                         messageData = new MessageData(data.getReceiverUID(), data.getReceiverEmail(), data.getMessage(), senderSelf,
-                                "0");
+                                String.valueOf(c.getTimeInMillis()));
                         chatData = new ChatData(data.getReceiverUID(), data.getReceiverEmail(), data.getMessage(),
-                                "0");
+                                String.valueOf(c.getTimeInMillis()));
 
                     }
                     else {
                         senderSelf = 0;
                         messageData = new MessageData(data.getSenderUID(), data.getSenderEmail(), data.getMessage(), senderSelf,
-                                "0");
+                                String.valueOf(c.getTimeInMillis()));
                         chatData = new ChatData(data.getSenderUID(), data.getSenderEmail(), data.getMessage(),
-                                "0");
+                                String.valueOf(c.getTimeInMillis()));
 
                     }
 
-                    ChatDatabaseHelper.insertMessage(dbChat, messageData);
-                    ContentValues chatValue = new ContentValues();
+//                    ChatDatabaseHelper.insertMessage(dbChat, messageData);
+//                    ContentValues chatValue = new ContentValues();
+//
+//                    chatValue.put(ChatDatabaseHelper.FRIENDUID, friendUID);
+//                    chatValue.put(ChatDatabaseHelper.FRIENDNAME, friendName);
+//                    chatValue.put(ChatDatabaseHelper.LASTMESSAGE, data.getMessage());
+//                    chatValue.put(ChatDatabaseHelper.LASTMESSAGETIME, data.getMessageTime());
+//
+//                    dbChat.replace(ChatDatabaseHelper.chatTable, null, chatValue);
+//
+////                    adapter.notifyDataSetChanged();
+//                    dataSnapshot.getRef().removeValue();
+//
 
-                    chatValue.put(ChatDatabaseHelper.FRIENDUID, friendUID);
-                    chatValue.put(ChatDatabaseHelper.FRIENDNAME, friendName);
-                    chatValue.put(ChatDatabaseHelper.LASTMESSAGE, data.getMessage());
-                    chatValue.put(ChatDatabaseHelper.LASTMESSAGETIME, data.getMessageTime());
-
-                    dbChat.replace(ChatDatabaseHelper.chatTable, null, chatValue);
-
-                    adapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -156,102 +238,48 @@ public class NewMessageActivity extends AppCompatActivity {
                 public void onCancelled(DatabaseError databaseError) {
 
                 }
-            });
+            };
 
-            databaseSyncOn = true;
         }
-    }
 
-    private void sendMessage()
-    {
-        Toast.makeText(this,"clicked",Toast.LENGTH_SHORT).show();
-        String message = messageText.getText().toString();
-        EditText editText = (EditText)findViewById(R.id.chat_write_message);
-        editText.setText("");
-        pushToOnlineDatabase(message);
-        updateChatTable(message);
-        updateMessagesTable(message);
+        attachDatabaseListener();
 
-    }
-
-    private void pushToOnlineDatabase(String message)
-    {
-        Query query = mChatDatabase.push();
-        ChatOnlineData onlineData = new ChatOnlineData(MainActivity.currentUser.getUid(),
-                friendUID,
-                message,
-                "0",
-                MainActivity.currentUser.getEmail(),
-                friendName);
-
-        query.getRef().setValue(onlineData);
-    }
-
-    private void updateMessagesTable(String message)
-    {
-        MessageData messageData;
-        messageData = new MessageData(friendUID, friendName, message, 1,
-                "0");
-        ChatDatabaseHelper.insertMessage(dbChat, messageData);
-    }
-
-
-    private void updateChatTable(String message)
-    {
-        ChatData chatData = new ChatData(friendUID, friendName, message,
-                "0");
-
-        ContentValues chatValue = new ContentValues();
-
-        chatValue.put(ChatDatabaseHelper.FRIENDUID, friendUID);
-        chatValue.put(ChatDatabaseHelper.FRIENDNAME, friendName);
-        chatValue.put(ChatDatabaseHelper.LASTMESSAGE, message);
-        chatValue.put(ChatDatabaseHelper.LASTMESSAGETIME, "0");
-
-        dbChat.replace(ChatDatabaseHelper.chatTable, null, chatValue);
-
-    }
-
-    public void onResume()
-    {
-        super.onResume();
-        createCursorAndAdapter();
     }
 
     private void createCursorAndAdapter()
     {
 
         try{
-            chatDatabaseHelper = new ChatDatabaseHelper(this);
-            dbChat = chatDatabaseHelper.getWritableDatabase();
+//            chatDatabaseHelper = new ChatDatabaseHelper(this);
+//            dbChat = chatDatabaseHelper.getWritableDatabase();
 
 
-            cursorMessages = dbChat.query(
-                    ChatDatabaseHelper.messageTable,
-                    new String[] {"_id",ChatDatabaseHelper.MESSAGE, ChatDatabaseHelper.SENDERSELF, ChatDatabaseHelper.MESSAGETIME},
-                    ChatDatabaseHelper.FRIENDUID + " = ?",
-                    new String[]{friendUID},
-                    null, null, null
-            );
+//            cursorMessages = dbChat.query(
+//                    ChatDatabaseHelper.messageTable,
+//                    new String[] {"_id",ChatDatabaseHelper.MESSAGE, ChatDatabaseHelper.SENDERSELF, ChatDatabaseHelper.MESSAGETIME},
+//                    ChatDatabaseHelper.FRIENDUID + " = ?",
+//                    new String[]{friendUID},
+//                    null, null, ChatDatabaseHelper.MESSAGETIME + " ASC"
+//            );
 
-            if(cursorMessages.moveToFirst())
-            {
+//            if(cursorMessages.moveToFirst())
+//            {
                 adapter = new MessageDisplayAdapter(getApplicationContext(), cursorMessages, 0);
                 listViewChats.setAdapter(adapter);
-            }
+//            }
 
         } catch (SQLiteException e)
         {
             Toast.makeText(this, "Database Unavailable", Toast.LENGTH_SHORT).show();
+            Log.e("BLA",e.toString());
         }
-
     }
 
     public void onDestroy(){
         super.onDestroy();
-        if(cursorMessages!=null)
-            cursorMessages.close();
-        if(dbChat !=null)
-            dbChat.close();
+//        if(cursorMessages!=null)
+//            cursorMessages.close();
+//        if(dbChat !=null)
+//            dbChat.close();
     }
 }

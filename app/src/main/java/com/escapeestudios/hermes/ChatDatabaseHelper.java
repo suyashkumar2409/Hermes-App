@@ -55,8 +55,8 @@ public class ChatDatabaseHelper extends SQLiteOpenHelper {
                     + SENDERSELF + " INTEGER, "
                     + MESSAGETIME+ " TEXT);");
 
-            MessageData temp = new MessageData("2Lwa9TtcFeaOm2J4MsuaTgP48qi1", "Suyash Kumar", "Hi", 0, "0");
-            insertMessage(db, temp);
+//            MessageData temp = new MessageData("2Lwa9TtcFeaOm2J4MsuaTgP48qi1", "Suyash Kumar", "Hi", 0, "0");
+//            insertMessage(db, temp);
         }
         else if(oldVersion < 2)
         {
@@ -83,6 +83,18 @@ public class ChatDatabaseHelper extends SQLiteOpenHelper {
         messageValue.put(SENDERSELF, messageData.getSenderSelf());
         messageValue.put(MESSAGETIME, messageData.getMessageTime());
         db.insert(messageTable, null, messageValue);
+    }
+
+    public static void insertMessage(SQLiteDatabase db, MessageData messageData, MessageDisplayAdapter adapter)
+    {
+        ContentValues messageValue = new ContentValues();
+        messageValue.put(FRIENDUID, messageData.getFriendUID());
+        messageValue.put(FRIENDNAME, messageData.getFriendName());
+        messageValue.put(MESSAGE, messageData.getMessage());
+        messageValue.put(SENDERSELF, messageData.getSenderSelf());
+        messageValue.put(MESSAGETIME, messageData.getMessageTime());
+        db.insert(messageTable, null, messageValue);
+        adapter.notifyDataSetChanged();
     }
 }
 
