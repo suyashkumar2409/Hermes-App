@@ -167,7 +167,7 @@ public class NewMessageActivity extends AppCompatActivity {
         chatValue.put(ChatDatabaseHelper.FRIENDUID, friendUID);
         chatValue.put(ChatDatabaseHelper.FRIENDNAME, friendName);
         chatValue.put(ChatDatabaseHelper.LASTMESSAGE, message);
-        chatValue.put(ChatDatabaseHelper.LASTMESSAGETIME, "0");
+        chatValue.put(ChatDatabaseHelper.LASTMESSAGETIME, chatData.getLastMessageTime());
 
         dbChat.replace(ChatDatabaseHelper.chatTable, null, chatValue);
 

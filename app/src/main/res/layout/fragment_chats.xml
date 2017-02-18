@@ -5,10 +5,13 @@
     tools:context="com.escapeestudios.hermes.ChatsFrag">
 
     <!-- TODO: Update blank fragment layout -->
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/chat_new_message"
-        />
+    <ListView
+        android:id="@+id/chat_history_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:transcriptMode="alwaysScroll"
+        >
+
+    </ListView>
 
 </FrameLayout>
