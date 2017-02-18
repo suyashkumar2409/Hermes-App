@@ -49,7 +49,9 @@ public class MainActivity extends AppCompatActivity {
     private Menu menu;
     private Fragment friendsFrag;
     private static boolean  headerMade = false;
-//    ****************  View Objects **********************************************
+    private static boolean  persistenceEnabled = false;
+
+    //    ****************  View Objects **********************************************
     private ViewPager mViewPager;
     private AppPagerAdapter mAppPagerAdapter;
 
@@ -59,6 +61,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if(persistenceEnabled==false) {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            persistenceEnabled = true;
+        }
 //        ************** Write Main Code here *********************
         ctx = this.getApplicationContext();
 

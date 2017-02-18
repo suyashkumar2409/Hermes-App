@@ -51,7 +51,6 @@ public class FriendsFrag extends Fragment {
         // Inflate the layout for this fragment
 
         rootView =  inflater.inflate(R.layout.fragment_friends, container, false);
-
         populated = false;
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -90,10 +89,10 @@ public class FriendsFrag extends Fragment {
 
     private void refreshLook()
     {
-        Toast.makeText(getContext(),"hello",Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getContext(),"hello",Toast.LENGTH_SHORT).show();
         if(friends.size()==0)
         {
-            Toast.makeText(getContext(),"hi",Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getContext(),"hi",Toast.LENGTH_SHORT).show();
 
             ((TextView)rootView.findViewById(R.id.friends_no_friends)).setVisibility(View.VISIBLE);
             ((ListView)rootView.findViewById(R.id.friends_list)).setVisibility(View.GONE);
@@ -108,7 +107,7 @@ public class FriendsFrag extends Fragment {
 
     private void populateFriends()
     {
-        Toast.makeText(getContext(),"happ",Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getContext(),"happ",Toast.LENGTH_SHORT).show();
         mUsersDatabase.child(MainActivity.currentUser.getUid()).child("friends")
         .addListenerForSingleValueEvent(new ValueEventListener(){
 
@@ -146,7 +145,7 @@ public class FriendsFrag extends Fragment {
                                                                 for (DataSnapshot checkinsnap : dataSnapshot.getChildren()) {
                                                                     CheckInData checkInData = checkinsnap.getValue(CheckInData.class);
                                                                     userExtra.setCheckInPlace(checkInData.getPlace());
-                                                                    Toast.makeText(getContext(),"here",Toast.LENGTH_SHORT).show();
+//                                                                    Toast.makeText(getContext(),"here",Toast.LENGTH_SHORT).show();
                                                                 }
                                                             }
 
