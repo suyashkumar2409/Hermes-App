@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_weight="6"
-        android:background="@drawable/rounded_corner1"
+        android:background="@drawable/rounded_corner_send"
         android:padding="16dp"
         android:text="Android charting application xml ui design. Android charting application xml ui design tutorial with example. Android charting application xml ui design. Android charting application xml ui design. "
         android:textColor="#000" />
