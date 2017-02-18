@@ -164,7 +164,10 @@ public class NewMessageActivity extends AppCompatActivity {
 
     private void sendMessage()
     {
+        Toast.makeText(this,"clicked",Toast.LENGTH_SHORT).show();
         String message = messageText.getText().toString();
+        EditText editText = (EditText)findViewById(R.id.chat_write_message);
+        editText.setText("");
         pushToOnlineDatabase(message);
         updateChatTable(message);
         updateMessagesTable(message);
