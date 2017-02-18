@@ -1,6 +1,7 @@
 package com.escapeestudios.hermes;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -11,10 +12,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
@@ -68,6 +71,7 @@ public class ChatsFrag extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_chats, container, false);
 
         listView = (ListView)view.findViewById(R.id.chat_history_list);
+        listView.setClickable(true);
         try{
             chatDatabaseHelper = new ChatDatabaseHelper(getActivity().getApplicationContext());
             dbChat = chatDatabaseHelper.getReadableDatabase();
@@ -76,7 +80,7 @@ public class ChatsFrag extends Fragment {
 //            if(cursorMessages.moveToFirst())
 //            {
             adapter = new SimpleCursorAdapter(getContext(), android.R.layout.simple_list_item_1, cursorChats,
-                    new String[]{ChatDatabaseHelper.FRIENDNAME},new int[]{android.R.id.text1}, 0);
+                    new String[]{ChatDatabaseHelper.FRIENDNAME, ChatDatabaseHelper.FRIENDUID},new int[]{android.R.id.text1, android.R.id.text2}, 0);
             listView.setAdapter(adapter);
 //            }
 
@@ -86,6 +90,22 @@ public class ChatsFrag extends Fragment {
             Log.e("BLA",e.toString());
         }
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor currentCursor = (Cursor)listView.getItemAtPosition(position);
+
+                String uid = currentCursor.getString(currentCursor.getColumnIndex(ChatDatabaseHelper.FRIENDUID));
+                String name = currentCursor.getString(currentCursor.getColumnIndex(ChatDatabaseHelper.FRIENDNAME));
+                Intent intent = new Intent(getActivity(), NewMessageActivity.class);
+
+                intent.putExtra(NewMessageActivity.UID, uid);
+                intent.putExtra(NewMessageActivity.NAME, name);
+
+                startActivity(intent);
+//                Toast.makeText(getContext(), .toString(), Toast.LENGTH_LONG).show();
+            }
+        });
         return view;
     }
 

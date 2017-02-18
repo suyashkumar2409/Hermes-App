@@ -77,7 +77,7 @@ public class SearchFriends extends AppCompatActivity {
                             User user = snapshot.getValue(User.class);
                             if(!user.getUid().equals(MainActivity.currentUser.getUid()))
                             arrayList.add(user);
-//                            Toast.makeText(SearchFriends.this, "added",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SearchFriends.this, "added",Toast.LENGTH_SHORT).show();
                         }
                         adapter.notifyDataSetChanged();
                     }
