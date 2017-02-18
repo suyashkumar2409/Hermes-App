@@ -16,13 +16,13 @@ public class ChatDatabaseHelper extends SQLiteOpenHelper {
     public static final String chatTable = "CHATTABLE";
     public static final String messageTable = "MESSAGETABLE";
 
-    private static final String FRIENDUID = "FRIENDUID";
-    private static final String FRIENDNAME = "FRIENDNAME";
-    private static final String LASTMESSAGE = "LASTMESSAGE";
-    private static final String LASTMESSAGETIME = "LASTMESSAGETIME";
-    private static final String MESSAGE = "MESSAGE";
-    private static final String SENDERSELF = "SENDERSELF";
-    private static final String MESSAGETIME = "MESSAGETIME";
+    public static final String FRIENDUID = "FRIENDUID";
+    public static final String FRIENDNAME = "FRIENDNAME";
+    public static final String LASTMESSAGE = "LASTMESSAGE";
+    public static final String LASTMESSAGETIME = "LASTMESSAGETIME";
+    public static final String MESSAGE = "MESSAGE";
+    public static final String SENDERSELF = "SENDERSELF";
+    public static final String MESSAGETIME = "MESSAGETIME";
 
     public ChatDatabaseHelper(Context ctx){
         super(ctx, DB_NAME, null, DB_VERSION);
@@ -54,6 +54,9 @@ public class ChatDatabaseHelper extends SQLiteOpenHelper {
                     + MESSAGE + " TEXT, "
                     + SENDERSELF + " INTEGER, "
                     + MESSAGETIME+ " TEXT);");
+
+            MessageData temp = new MessageData("2Lwa9TtcFeaOm2J4MsuaTgP48qi1", "Suyash Kumar", "Hi", 0, "0");
+            insertMessage(db, temp);
 
         }
     }

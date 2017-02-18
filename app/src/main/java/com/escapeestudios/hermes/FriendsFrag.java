@@ -81,8 +81,8 @@ public class FriendsFrag extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), NewMessageActivity.class);
                 UserExtra extra = friends.get(position);
-                intent.putExtra(ChatsFrag.UID, extra.getUid());
-                intent.putExtra(ChatsFrag.NAME, extra.getName());
+                intent.putExtra(NewMessageActivity.UID, extra.getUid());
+                intent.putExtra(NewMessageActivity.NAME, extra.getName());
 
                 startActivity(intent);
             }

@@ -13,8 +13,6 @@ import android.view.ViewGroup;
  */
 public class ChatsFrag extends Fragment {
 
-    public static final String UID = "UID";
-    public static final String NAME = "NAME";
 
     public ChatsFrag() {
         // Required empty public constructor
