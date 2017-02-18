@@ -31,14 +31,15 @@ public class MessageDisplayAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view = messageDisplayInflator.inflate(R.layout.single_message, parent, false);
-        message = cursor.getString(cursor.getColumnIndex(ChatDatabaseHelper.MESSAGE));
-        senderSelf = cursor.getInt(cursor.getColumnIndex(ChatDatabaseHelper.SENDERSELF));
-        messageTime = cursor.getString(cursor.getColumnIndex(ChatDatabaseHelper.MESSAGETIME));
         return view;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        message = cursor.getString(cursor.getColumnIndex(ChatDatabaseHelper.MESSAGE));
+        senderSelf = cursor.getInt(cursor.getColumnIndex(ChatDatabaseHelper.SENDERSELF));
+        messageTime = cursor.getString(cursor.getColumnIndex(ChatDatabaseHelper.MESSAGETIME));
+
         LinearLayout messageReceived = (LinearLayout)view.findViewById(R.id.message_received);
         LinearLayout messageSent = (LinearLayout)view.findViewById(R.id.message_sent);
         if(senderSelf == 1)
